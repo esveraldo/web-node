@@ -1,0 +1,23 @@
+{
+  "name": "web-node",
+  "version": "1.0.0",
+  "description": "Estudo node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esveraldo/web-node.git"
+  },
+  "author": "Esveraldo Martins",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/esveraldo/web-node/issues"
+  },
+  "homepage": "https://github.com/esveraldo/web-node#readme",
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  }
+}
