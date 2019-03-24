@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+    <title>Web node</title>
+  </head>
+  <body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Cadastro</h1>
+                    <form class="form-inline" method="" action="">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label for="nome" class="sr-only">Nome</label>
+                            <input type="text" name="nome" class="form-control" id="texto" placeholder="Nome">
+                        </div>
+                            <button type="button"class="btn btn-primary mb-2" id="button">Enviar <i class="fa fa-check" aria-hidden="true"></i> </button>
+                 </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sx-12">
+                <h2>Lista de nomes</h2>
+                <div class="">
+                    <ul class="list-group" id="lista"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+
+        window.onload = () => {
+            const lista = document.querySelector('#lista');
+            const texto = document.querySelector('#texto');
+            const botao = document.querySelector('#button');
+
+            botao.addEventListener('click', create);
+            lista.addEventListener('click', del);
+            lista.addEventListener('click', edit);
+
+            read();
+        };
+
+        function templateLI(id, nome, element = true){
+            return `
+                ${element ? `<li class="list-group-item">` : ''}
+                ${nome} 
+                <i style="float:right; margin-left:5px;" class="btn btn-danger delete fa fa-trash" data-id="${id}"></i>
+                <i style="float:right; margin-left:15px;" class="btn btn-warning update fa fa-wrench" data-id="${id}"></i> 
+                ${element ? `</li>` : ''}
+                `;
+        }
+
+        function read(){
+
+            lista.innerHTML = '';
+
+            axios.get('/read')
+            .then((response) => {
+                // handle success
+                console.log(response);
+
+                response.data.forEach(element => {
+                    lista.innerHTML += templateLI(element.id_rest, element.nome);
+                });
+            })
+            .catch((error) => {
+                // handle error
+                console.log(error);
+            })
+            .then(() => {
+                // always executed
+            });
+
+        };
+
+        function show(){
+
+        };
+
+        function create(){
+
+            const newName = texto.value;
+
+            axios.post('/create', {
+            nome: newName,
+            })
+            .then(function (response) {
+                console.log(response);
+                lista.innerHTML += templateLI(response.data[0], newName);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        };
+
+        function edit(element){
+
+            if(element.target.classList.contains('update')){
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.setAttribute('value', '');
+                const pai = element.target.parentElement;
+
+                const id = element.target.dataset.id;
+
+                pai.innerHTML = '';
+                pai.appendChild(input);
+
+                input.addEventListener('keydown', update.bind(pai, id, input));
+                input.focus();
+            }
+
+        };
+
+        function update(id, input){
+
+            const x = event.key;
+
+            if(x == null || x != 'Enter') return;
+
+            axios.put(`/update/${id}`, { nome: input.value })
+            .then((response) => {
+                if(response.status = 200){
+                    this.innerHTML = templateLI(id, input.value, false);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+        };
+
+        function del(element){
+
+            console.log(element);
+
+            if(element.target.classList.contains('delete')){
+                //dataset é usado para pegar o valor de data no html 5 no nosso caso o data-id
+                const id = element.target.dataset.id;
+                console.log(id);
+
+                axios.delete(`/delete/${id}`)
+                .then((response) => {
+                    if(response.status = 200){
+                        //Procura o elemento pai que é o li(procurar no inspetor de codigo por path)
+                        lista.removeChild(element.path[1]);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }
+        };
+
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
